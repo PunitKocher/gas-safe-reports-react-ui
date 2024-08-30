@@ -56,7 +56,7 @@ const Example: React.FC = () => {
   const [globalFilter, setGlobalFilter] = useState('');
   const [sorting, setSorting] = useState<MRT_SortingState>([]);
   const [pagination, setPagination] = useState<MRT_PaginationState>({
-    pageIndex: 0,
+    pageIndex: 1,
     pageSize: 10,
   });
   const [serverError, setServerError] = useState<string | null>(null);
@@ -110,10 +110,6 @@ const Example: React.FC = () => {
     },
     refetchOnWindowFocus: false,
   });
-
-  useEffect(() => {
-    refetch();
-  }, [pagination, columnFilters, globalFilter, sorting, refetch]);
 
   const columns = useMemo<MRT_ColumnDef<User>[]>(
     () => [
@@ -269,6 +265,7 @@ const Example: React.FC = () => {
       deleteUserMutation.mutateAsync(row.original.id);
     }
   };
+  const isSaving = createUserMutation.isPending || updateUserMutation.isPending || deleteUserMutation.isPending;
 
   return (
     <MaterialReactTable
@@ -354,8 +351,7 @@ const Example: React.FC = () => {
       state={{
         columnFilters,
         globalFilter,
-        isLoading,
-        isSaving: createUserMutation.isLoading || updateUserMutation.isLoading || deleteUserMutation.isLoading,
+        isLoading: isSaving || isRefetching,
         pagination,
         showAlertBanner: isError,
         showProgressBars: isRefetching,
